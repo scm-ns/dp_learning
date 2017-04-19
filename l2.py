@@ -193,6 +193,79 @@ model.pop()
 for layer in model.layers:
     layer.trainable = False
 
+model.add(Dense(2 , activation = "softmax"))
+
+
+gen = image.imageDataGenerator()
+batches = gen.flow(trn_data , trn_labels , batch_size = batch_size , shuffle = True)
+val_batches = gen.flow(val_data , val_labels , batch_size = batch_size , shuffle = False)
+
+
+def fit_model(model , batches , val_batches , np_epoch = 1):
+    model.fit_generator(batches , samples_per_epoch = batches.N , np_epoch = nb_epoch , 
+            validation_data = val_batches , nb_val_samples = val_batches.N)
+
+opt = RMSprop(lr = 0.1)
+model.compile(optimizer = opt , loss = "categorical_crossentropy" , metrics = ["accuracy"])
+
+fit_model(model , batches , val_batches , nb_epoch = 2)
+
+
+
+model.save_weights(model_path + "finetune1.h5")
+
+model.load_weights(model_path + "finetune1.h5")
+
+
+model.evaluate(val_data , val_labels)
+
+preds = model.predict_classes(val_data , batch_size = batch_size)
+probs = model.predict_proba(val_data , batch_size = batch_size)[: , 0]
+probs[:8]
+
+plot_confusion_matrix(cm , { "cat" : 0 , "dog" : 1 })
+
+import sympy as sp
+x = sp.var("x")
+pow(2 * x , 2).diff()
+
+layers = model.layers
+first_dense_idx = [index for index , layer in enumerate(layers) is type(layer) is Dense][0]
+
+for layer in layers[first_dense_idx]:
+    layer.trainable = True
+
+K.set_value(opt.lr , 0.01)
+fit_model(model , batches , val_batches , 3)
+
+model.save_weights(model_path + "finetune2.h5")
+
+
+for layer in layers[12:]:
+    layer.trainable = True
+K.set_value(opt.lr , 0.001)
+
+fit_mode(model , batches , val_batches , 4)
+
+model.save_weights(model_path + "finetune3.h5")
+
+
+model.load_weights(model_path + finetune2.h5")
+model.evaluate_generator(get_batches("valid" , gen , False , batch_size*2) , val_batches.N)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
