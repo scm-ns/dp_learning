@@ -1,13 +1,13 @@
 # Copy/Rewrite of fast.ai tutorials
 
+from __future__ import division, print_function
 from theano.sandbox import cuda
 
-from utils import *
-from __future__ import division, print_function
-
+#from utils import *
+import os
 
 path = "data/dogscats/"
-modelpath = path + "models/"
+model_path = path + "models/"
 
 if not os.path.exists(model_path):
     os.mkdir(model_path)
@@ -49,5 +49,21 @@ fc_layers = layers[last_conv_idx + 1:] # Create fc starting from the end of the 
 
 
 batches = get_batches(path + "train" , shuffle = False , batch_size = batch_size)
-val_batches = get_batches(path + "valid"
+val_batches = get_batches(path + "valid" , shuffle = False , batch_size = batch_size)
+
+print(batches)
+
+# Get the number of classes ? What is this ? 
+val_classes = val_batches.classes
+trn_classes = branches.classes
+
+print(val_classes)
+
+
+# Create a vector of classes ? 
+val_labels = onehot(val_classes)
+trn_labels = onehot(trn_classes)
+
+print(val_labels)
+
 
