@@ -48,5 +48,6 @@ conv_model = Sequential(conv_layers) # Create seperate model from only the conv 
 fc_layers = layers[last_conv_idx + 1:] # Create fc starting from the end of the conv2d layers
 
 
-
+batches = get_batches(path + "train" , shuffle = False , batch_size = batch_size)
+val_batches = get_batches(path + "valid"
 
