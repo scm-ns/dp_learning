@@ -215,30 +215,35 @@ bn_layers = get_bn_layers(0.6)
 bn_layers.pop()
 bn_layers.append(Dense(2,activation="softmax"))
 
+final_model = Sequential(conv_layers)
+
+for layer in final_model.layers:
+    layer.trainable = False
+    
+for layer in bn_layers: # Combine  the conv layers and the batch norm layers
+    final_model.add(layer)
+
+for l1 , l2 in zip(bn_model.layers ,bn_layers):  # move weights from the bn for 1000 classes to bn layers for 2 classe
+    l2.set_weights(l1.get_weights())
+
+final_model.compile(optimizer=Adam() , loss= "categorical_crossentropy" , metrics=["accuracry"])
+
+final_model.fit_generator(batches , samples_per_epoch = batches.nb_sample , nb_epoch = 1,
+        validation_data = val_batches , nb_val_samples = val_batches.nb_sample)
+
+final_model.save_weights(model_path + "final1.h5")
+
+final_model.fit_generator(batches , samples_per_epoch = batches.nb_sample , nb_epoch = 1,
+        validation_data = val_batches , nb_val_samples = val_batches.nb_sample)
 
 
+final_model.save_weights(model_path + "final2.h5")
 
+final_model.optimizer.lr = 0.001
 
+final_model.fit_generator(batches , samples_per_epoch = batches.nb_sample , nb_epoch = 4 , 
+        validation_data = val_batches , nb_val_samples = val_batches.nb_sample)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+bn_model.save_weights(model_path + "final3.h5")
 
 
