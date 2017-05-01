@@ -96,27 +96,14 @@ def hog_feature(im):
     return orientation_histogram.ravel()
 
 
+def color_histogram_hsv(im , nbin = 10 , xmax = 255 , normazlized = True):
+
+    # Histogram using hue
+    ndim = im.ndim
+    bins = np.linspace(xmin , xmax , nbin + 1)
+    hsv = plt.colors.rgb_to_hsv(im / xmax) * xmax
+    imhist , bin_edges = np.histogram(hsv[:,:,0] , bins = bins , density = normalized)
+    imhist = imhist * np.diff(bin_edges)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+pass
