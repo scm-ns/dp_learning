@@ -65,15 +65,35 @@ def hog_feature(im):
 
 
     sx , sy = image.shape
-    orientation = 9 # number of gradient bins
+    orientations = 9 # number of gradient bins
     cx , cy = (8,8) # pixcels per cell
 
+    gx = np.zeros(image.shape)
+    gy = np.zeros(image.shape)
+    # compute gradients along each directions
+    gx[: , :-1] = np.diff(image , n=1 , axis = 1 )
+    gy[:-1 , :] = np.diff(image , n=1 , axis = 0)
 
-    gx
+    grad_mag = np.sqrt(gx**2 + gy**2)
+    grad_ori = np.arctan(gy , (gx + 1e-15)) * (180 / np.pi) + 90 # gradient orientation
 
+    # number of cells 
+    n_cellsx = int(np.floor(sx / cx))
+    n_cellsy = int(np.floor(sy / cy))
+    
+    orientation_histogram = np.zeros((n_cellsx , n_cellsy , orientations))
+    for i in range(orientations):
 
+        #create new integral image for this orientation
+        # isolate orientations in range
+        temp_ori = np.where(grad_ori < 180 / orientations * (i+1) , grad_ori , 0)
+        temp_ori = np.where(grad_ori >=180 / orientations * i , temp_ori , 0)
 
+        cond2 = temp_ori > 0
+        temp_mag = np.where(cond2 , grad_mag , ))
+        orientation_histogram[: , : , i] =  uniform_filter(temp_mag , size=(cx , cy))[cx/2::cx , cy/2::cy].T
 
+    return orientation_histogram.ravel()
 
 
 
