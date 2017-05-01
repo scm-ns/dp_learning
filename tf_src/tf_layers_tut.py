@@ -54,6 +54,30 @@ def cnn_model_fn(features, labels, mode):
 
     return model_fn_lib.ModelFnOps(mode = mode , predictions = predictions , loss = loss , train_op = train_op)
 
+def main():
+    mnist = learn.datasets.load_dataset("mnist")
+
+    train_data = mnist.train.images
+    train_labels = np.asarray(mnist.train.labels, dtype=np.int32)
+
+    eval_data = mnist.test.images
+    eval_labels = np.asarray(mnist.test.labels , dtype=np.int32)
+
+    mnist_classifier = learn.Estimator(model_fn = cnn_model_fn , model_dir = "/tmp/mnist_convnet_model")
+
+
+    # Proper way to set up logging
+    tensors_to_log = {"probabilities" : "softax_tensor"}
+    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log , every_n_iter = 50)
+
+    mnist_classifier.fit(x = train.data , y = train.labels , batch_size = 100 , steps = 20000,
+            monitors = [logging_hook])
+
+    metrics = {"accuracy" : learn.MetricSpec(metric_fn =tf.metrics.accuracy , prediction_key = "classes")}
+
+    eval_results = mnist_classifier.evaluate(x = eval_data , y=eval_labels , metrics = metrics)
+
+    print(eval_results)
 
 
 
