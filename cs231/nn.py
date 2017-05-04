@@ -24,5 +24,29 @@ b = np.zeros((1, K))
 scores = np.dot(X , W) + b 
 print(scores)
 
+## SOFTMAX applied to each prediction
+exp_scores = np.exp(scores)
+probs = exp_scores / np.sum( exp_scores , axis = 1 , keepdims = True)
+
+## SOFTMAX CLASSIFIER LOSS Function
+reg = 0.01
+correct_logprob = -np.log(probs[range(N * K) , y])
+data_loss= np.sum(correct_logprob) / (N*K)
+reg_loss = 0.5 * reg * np.sum(W * W);
+loss = data_loss = reg_loss
+
+grad_scores = probs 
+grad_scores[range(N*K) , y] -= 1
+grad_scores /= (N*K)
+
+dW = np.dot(X.T , grad_scores)
+db = np.sum(grad_scores , axis = 1 , keepdims = True)
+dW += reg * W
+
+W += - step_size * dW
+b += - step_size * db
+
+
+
 
 
