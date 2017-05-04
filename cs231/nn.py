@@ -18,3 +18,11 @@ for cls in range(K):
 plt.scatter(X[: ,0] , X[: , 1], c = y , s = 40 , cmap = plt.cm.Spectral)
 plt.show()
 
+W = 0.01 * np.random.randn(D , K)
+b = np.zeros((1, K))
+
+scores = np.dot(X , W) + b 
+print(scores)
+
+
+
