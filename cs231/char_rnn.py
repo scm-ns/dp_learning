@@ -25,5 +25,9 @@ bias_h = np.zeros((hid_layer_size , 1))
 bias_y = np.zeros((len(chars) , 1))
 
 
+def loss_func(inputs, targets , h_prev):
+    xs , hs , ys , ps = {} , {} , {} , {}
+    hs[-1] = np.copy
+
 
 
