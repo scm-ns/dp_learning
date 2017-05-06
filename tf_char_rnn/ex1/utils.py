@@ -60,3 +60,34 @@ class text_loader():
         self.num_batches = int(self.tensor.size / (self.batch_size * self.seq_len))
 
 
+    def create_batches(self):
+        self.num_batches = int(self.tensor.size / (self.batch_size * self.seq_len))
+
+        if self.num_batches == 0 :
+            assert(False , "Not enough data !!!")
+
+        self.tensor = self.tensor[:self.num_batches * self.batch_size * self.seq_len]
+        xdata = self.tensor
+        ydata = np.copy(self.tensor)
+
+        ydata[:-1] = xdata[1:] #stores the values in xdata from 1 (skipping zero) til end into ydata from 0 til the second last item
+        # essentially moves the data from xdata forward by 1 in ydata
+        # copy the first item in xdata to last item in ydata
+        ydata[-1] = xdata[0]
+
+        # reshape , changes the shape of the array into array with self.batch_size num of rows
+        # split , splits the np array into a list of different np.arrays based on self.num_batches
+        self.x_batches = np.split(xdata.reshape(self.batch_size , -1) , self.num_batches , 1)
+        self.y_batches = np.split(ydata.reshape(self.batch_size , -1) , self.num_batches , 1)
+
+
+    def next_batch(self):
+        x , y = self.x_batches[self.pointer] , self.y_batches[self.pointer]
+        self.pointer += 1
+        return x , y
+    
+    def reset_batch_pointer(self):
+        self.pointer = 0 
+
+
+
