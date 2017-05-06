@@ -21,32 +21,40 @@ plt.show()
 W = 0.01 * np.random.randn(D , K)
 b = np.zeros((1, K))
 
-scores = np.dot(X , W) + b 
-print(scores)
+reg = 1e-3
+step_size = 1e-0
 
-## SOFTMAX applied to each prediction
-exp_scores = np.exp(scores)
-probs = exp_scores / np.sum( exp_scores , axis = 1 , keepdims = True)
+for i in xrange(200):
+    scores = np.dot(X , W) + b 
+    print(scores)
 
-## SOFTMAX CLASSIFIER LOSS Function
-reg = 0.01
-correct_logprob = -np.log(probs[range(N * K) , y])
-data_loss= np.sum(correct_logprob) / (N*K)
-reg_loss = 0.5 * reg * np.sum(W * W);
-loss = data_loss = reg_loss
+    ## SOFTMAX applied to each prediction
+    exp_scores = np.exp(scores)
+    probs = exp_scores / np.sum( exp_scores , axis = 1 , keepdims = True)
 
-grad_scores = probs 
-grad_scores[range(N*K) , y] -= 1
-grad_scores /= (N*K)
+    ## SOFTMAX CLASSIFIER LOSS Function
+    correct_logprob = -np.log(probs[range(N * K) , y])
+    data_loss= np.sum(correct_logprob) / (N*K)
+    reg_loss = 0.5 * reg * np.sum(W * W);
+    loss = data_loss = reg_loss
 
-dW = np.dot(X.T , grad_scores)
-db = np.sum(grad_scores , axis = 1 , keepdims = True)
-dW += reg * W
+    if i % 10 == 0:
+        print "iteration %d : loss %f " , (i , loss)
 
-W += - step_size * dW
-b += - step_size * db
+    grad_scores = probs 
+    grad_scores[range(N*K) , y] -= 1
+    grad_scores /= (N*K)
+
+    dW = np.dot(X.T , grad_scores)
+    db = np.sum(grad_scores , axis = 1 , keepdims = True)
+    dW += reg * W
+
+    W += - step_size * dW
+    b += - step_size * db
 
 
-
+scores = np.dot(X, W) + b
+predicted_class = np.argmax(scores, axis=1)
+print 'training accuracy: %.2f' % (np.mean(predicted_class == y))
 
 
