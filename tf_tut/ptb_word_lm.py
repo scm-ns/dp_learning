@@ -66,6 +66,7 @@ import reader
 
 flags = tf.flags
 logging = tf.logging
+# Cool way to specify arguments
 
 flags.DEFINE_string(
     "model", "small",
@@ -90,7 +91,7 @@ class PTBInput(object):
   def __init__(self, config, data, name=None):
     self.batch_size = batch_size = config.batch_size
     self.num_steps = num_steps = config.num_steps
-    self.epoch_size = ((len(data) // batch_size) - 1) // num_steps
+    self.epoch_size = ((len(data) // batch_size) - 1) // num_steps # number of batches to process in each step ? 
     self.input_data, self.targets = reader.ptb_producer(
         data, batch_size, num_steps, name=name)
 
@@ -123,19 +124,28 @@ class PTBModel(object):
         return tf.contrib.rnn.BasicLSTMCell(
             size, forget_bias=0.0, state_is_tuple=True)
     attn_cell = lstm_cell
-    if is_training and config.keep_prob < 1:
+    if is_training and config.keep_prob < 1: # modify the cell if training and dropout required
       def attn_cell():
         return tf.contrib.rnn.DropoutWrapper(
             lstm_cell(), output_keep_prob=config.keep_prob)
+
+    # RNN does not have multiple cells in the same layer it seems
+    # That diagram could be just because of the unrolling step
+    # so feed the input into a single cell in a single lanyer
+    # Then feed that into the next layer, but carry the cell state to the cell from the 
+    # same layer during the next input
     cell = tf.contrib.rnn.MultiRNNCell(
         [attn_cell() for _ in range(config.num_layers)], state_is_tuple=True)
 
-    self._initial_state = cell.zero_state(batch_size, data_type())
+    self._initial_state = cell.zero_state(batch_size, data_type()) # what is batch size doing here ? 
+    #  batch size could be used to determine the number of hidden cells used in the computation
+    # so a single super lstm cell, but this has many inner cells, which is same as the batch size number ???
+    # take makes sense, so a single lstm cell is not a single hidden layer cell, but rather, multiple cells !!
 
     with tf.device("/cpu:0"):
       embedding = tf.get_variable(
-          "embedding", [vocab_size, size], dtype=data_type())
-      inputs = tf.nn.embedding_lookup(embedding, input_.input_data)
+          "embedding", [vocab_size, size], dtype=data_type()) # create the embeddings of size size
+      inputs = tf.nn.embedding_lookup(embedding, input_.input_data) # convert the words into the correponding embedding.
 
     if is_training and config.keep_prob < 1:
       inputs = tf.nn.dropout(inputs, config.keep_prob)
@@ -146,46 +156,54 @@ class PTBModel(object):
     #
     # The alternative version of the code below is:
     #
-    # inputs = tf.unstack(inputs, num=num_steps, axis=1)
+    # inputs = tf.unstack(inputs, num=num_steps, axis=1) # What does unstack here do ??
     # outputs, state = tf.contrib.rnn.static_rnn(
     #     cell, inputs, initial_state=self._initial_state)
+
     outputs = []
     state = self._initial_state
     with tf.variable_scope("RNN"):
       for time_step in range(num_steps):
         if time_step > 0: tf.get_variable_scope().reuse_variables()
-        (cell_output, state) = cell(inputs[:, time_step, :], state)
-        outputs.append(cell_output)
+        # pass in the input, is time_step refering to the index of the word ? inputs is just an embedding
+        (cell_output, state) = cell(inputs[:, time_step, :], state) # what is with the indexing here ?? Is it taking out the word ? What are the 3 things here though ? Does dropout add somethig to the tensor ?
+        # also the cell is not a single cell , but multiple lstm cells.May be soem weird indexing ??
+        outputs.append(cell_output) # output from the cell. prediction of the next word ?? and state is the cell_state passed between the different lstm cells
+    
+    # stores multiple tensors into a single tensor
+    output = tf.reshape(tf.stack(axis=1, values=outputs), [-1, size]) # takes multiple tensors  and concates them into a single tensor
+    # reshape 
 
-    output = tf.reshape(tf.stack(axis=1, values=outputs), [-1, size])
-    softmax_w = tf.get_variable(
-        "softmax_w", [size, vocab_size], dtype=data_type())
+    softmax_w = tf.get_variable("softmax_w", [size, vocab_size], dtype=data_type())
     softmax_b = tf.get_variable("softmax_b", [vocab_size], dtype=data_type())
+
     logits = tf.matmul(output, softmax_w) + softmax_b
-    loss = tf.contrib.legacy_seq2seq.sequence_loss_by_example(
+
+    loss = tf.contrib.legacy_seq2seq.sequence_loss_by_example( # seq2seq models
         [logits],
-        [tf.reshape(input_.targets, [-1])],
-        [tf.ones([batch_size * num_steps], dtype=data_type())])
+        [tf.reshape(input_.targets , [-1])],
+        [tf.ones([batch_size * num_steps], dtype=data_type())]) # what is the ones doing ?
+
     self._cost = cost = tf.reduce_sum(loss) / batch_size
     self._final_state = state
 
     if not is_training:
       return
 
-    self._lr = tf.Variable(0.0, trainable=False)
-    tvars = tf.trainable_variables()
+    self.slr = tf.Variable(0.0, trainable=False)
+    tvars = tf.trainable_variables() # what is this doing. Shouldn't the trianable variables be inside the lstm ? 
     grads, _ = tf.clip_by_global_norm(tf.gradients(cost, tvars),
-                                      config.max_grad_norm)
-    optimizer = tf.train.GradientDescentOptimizer(self._lr)
-    self._train_op = optimizer.apply_gradients(
-        zip(grads, tvars),
-        global_step=tf.contrib.framework.get_or_create_global_step())
+                                      config.max_grad_norm) # okay, contorl how the gradident flows between LSTM cell at different time steps ? 
 
-    self._new_lr = tf.placeholder(
-        tf.float32, shape=[], name="new_learning_rate")
-    self._lr_update = tf.assign(self._lr, self._new_lr)
+    optimizer = tf.train.GradientDescentOptimizer(self._lr) 
+    
+    # how to apply the gradients ? What is this ? # another way to pass the model into the optimizer
+    self._train_op = optimizer.apply_gradients(zip(grads, tvars), global_step=tf.contrib.framework.get_or_create_global_step())
 
-  def assign_lr(self, session, lr_value):
+    self._new_lr = tf.placeholder(tf.float32, shape=[], name="new_learning_rate")
+    self._lr_update = tf.assign(self._lr, self._new_lr) # May be reducing the traiing rate when cloesr to solution or somthing like that ? 
+
+  def assign_lr(self, session, lr_value): # okay, changing the training rate during the running of the sessions ?? 
     session.run(self._lr_update, feed_dict={self._new_lr: lr_value})
 
   @property
@@ -220,11 +238,11 @@ class SmallConfig(object):
   max_grad_norm = 5
   num_layers = 2
   num_steps = 20
-  hidden_size = 200
+  hidden_size = 200 # hidden size for what, for each of the inner cells in the lstm ?? Where is this passed in 
   max_epoch = 4
   max_max_epoch = 13
   keep_prob = 1.0
-  lr_decay = 0.5
+  lr_decay = 0.5 # okay, may be for this decay, we have this option of changing the lr
   batch_size = 20
   vocab_size = 10000
 
@@ -282,22 +300,24 @@ def run_epoch(session, model, eval_op=None, verbose=False):
   start_time = time.time()
   costs = 0.0
   iters = 0
-  state = session.run(model.initial_state)
+  state = session.run(model.initial_state) # fill everything with zeros !!
 
   fetches = {
       "cost": model.cost,
       "final_state": model.final_state,
   }
+
   if eval_op is not None:
-    fetches["eval_op"] = eval_op
+    fetches["eval_op"] = eval_op # ?? 
 
-  for step in range(model.input.epoch_size):
-    feed_dict = {}
-    for i, (c, h) in enumerate(model.initial_state):
-      feed_dict[c] = state[i].c
-      feed_dict[h] = state[i].h
+  for step in range(model.input.epoch_size): # for each epoch
+    feed_dict = {} # form the input dict
+    for i, (c, h) in enumerate(model.initial_state): # state is the model initial state
+      # this is sense less code, c and h will change each iter and store it ?  ?? What is this ??
+      feed_dict[c] = state[i].c   # feed dict store the cell state as the cell state ? what is the difference between the key and value here ? 
+      feed_dict[h] = state[i].h   
 
-    vals = session.run(fetches, feed_dict)
+    vals = session.run(fetches, feed_dict) # feed the dict into the algo !!
     cost = vals["cost"]
     state = vals["final_state"]
 
@@ -367,7 +387,7 @@ def main(_):
         m.assign_lr(session, config.learning_rate * lr_decay)
 
         print("Epoch: %d Learning rate: %.3f" % (i + 1, session.run(m.lr)))
-        train_perplexity = run_epoch(session, m, eval_op=m.train_op,
+        train_perplexity = run_epoch(session, m, eval_op=m.train_op, 
                                      verbose=True)
         print("Epoch: %d Train Perplexity: %.3f" % (i + 1, train_perplexity))
         valid_perplexity = run_epoch(session, mvalid)
@@ -379,6 +399,8 @@ def main(_):
       if FLAGS.save_path:
         print("Saving model to %s." % FLAGS.save_path)
         sv.saver.save(session, FLAGS.save_path, global_step=sv.global_step)
+
+# Understood little bit, but I don't think I will creating my own model for the things that I need to get done for now. 
 
 
 if __name__ == "__main__":
