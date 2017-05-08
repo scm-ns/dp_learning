@@ -6,8 +6,8 @@ from scipy.misc import imread
 from scipy.misc import imresize
 
 
-train_x =  np.zeros((1, 277 , 227 , 3),dtype=np.float)
-train_y = np.zeros((1,1000),dtype=np.int)
+train_x =  np.zeros((1, 277 , 227 , 3)).astype(np.float32)
+train_y = np.zeros((1,1000))
 xdim = train_x.shape[1:]
 ydim = train_y.shape[1:]
 
