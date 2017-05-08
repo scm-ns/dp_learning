@@ -29,7 +29,7 @@ def AlexNet(features , for_transfer_learning = False):
     conv1W = tf.Variable(net_pretrained["conv1"]["weights"])
     conv1b = tf.Variable(net_pretrained["conv1"]["biases"])
     conv1_in = conv(features, conv1W , conv1b , kernel_size , kernel_size ,channels , stride , stride , padding="SAME" , group = 1)
-    conv1 = tf.nn.rele(conv1_in)
+    conv1 = tf.nn.relu(conv1_in)
 
     # normalization ?? 
     radius = 2
