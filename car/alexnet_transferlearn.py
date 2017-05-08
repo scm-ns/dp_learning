@@ -1,6 +1,10 @@
 import numpy as np
 import tensorflow as tf
 
+from scipy.misc import imread
+from scipy.misc import imresize
+
+
 train_x =  np.zeros((1, 277 , 227 , 3),dtype=np.float)
 train_y = np.zeros((1,1000),dtype=np.int)
 xdim = train_x.shape[1:]
@@ -13,7 +17,15 @@ x = tf.placeholder(tf.float32 ,(None,) + xdim)
 resized = tf.image.resize_images(x , (227,227))
 
 
+prob = AlexNet(resized)
 
-prob = 
+init = tf.initialize_all_variables()
+sess = tf.Session()
+sess.run(init)
 
+im1 = (imread("poodle.png")[:,:,:3]).astype(float32)
+im1 = im1 - np.mean(im1)
+
+im2 = (imread("weasel.png")[:,:,:3]).astype(float32)
+im2 = im2 - np.mean(im1)
 
