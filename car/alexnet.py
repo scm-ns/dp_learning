@@ -13,10 +13,12 @@ def conv(input , kernel , biases , kernel_h , kernel_w , num_channels , stride_h
     if group == 1:
         conv = convolve(input , kernel)
     else:
-        input_groups = tf.split(3 , group , input) # how to divide the input into groups with
-        kernel_groups = tf.split(3 , group , kernel)
+        tf.split
+        input_groups = tf.split(input , group ,3) # how to divide the input into groups with
+        kernel_groups = tf.split(kernel , group , 3)
         output_groups = [convolve(i,k) for i , k in zip(input_groups , kernel_groups)]
-        conv = tf.concat(3 , output_groups)
+        print(output_groups)
+        conv = tf.concat( output_groups , 3)
     # reshape the tensor, may be for feeding or reading from caffe ??
     return tf.reshape(tf.nn.bias_add(conv , biases) , [-1] + conv.get_shape().as_list()[1:])
 
@@ -42,7 +44,7 @@ def AlexNet(features , for_transfer_learning = False):
     kernel = 3
     stride = 2
     padding= "VALID"
-    maxpool1 = tf.nn.max_pool(lrn1 , ksize=[1 , kernel , kernel , 1] , stride=[1 , stride , stride , 1] , padding =padding)
+    maxpool1 = tf.nn.max_pool(lrn1 , ksize=[1 , kernel , kernel , 1] , strides=[1 , stride , stride , 1] , padding =padding)
 
     # conv2
     kernel = 5
