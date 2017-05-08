@@ -27,7 +27,7 @@ def AlexNet(features , for_transfer_learning = False):
     stride = 4
     channels = 96
     conv1W = tf.Variable(net_pretrained["conv1"]["weights"])
-    conv1b = tf.Varaible(net_pretrained["conv1"]["biases"])
+    conv1b = tf.Variable(net_pretrained["conv1"]["biases"])
     conv1_in = conv(features, conv1W , conv1b , kernel_size , kernel_size ,channels , stride , stride , padding="SAME" , group = 1)
     conv1 = tf.nn.rele(conv1_in)
 
@@ -50,7 +50,7 @@ def AlexNet(features , for_transfer_learning = False):
     stride = 1
     group = 2
     conv2W = tf.Variable(net_pretrained["conv2"]["weights"])
-    conv2b = tf.Varaible(net_pretrained["conv2"]["biases"])
+    conv2b = tf.Variable(net_pretrained["conv2"]["biases"])
     conv2_in = conv(maxpool1 , conv2W , conv2b , kernel , kernel, channels , stride , stride , padding="SAME", group =group )
 
     #lrn2
@@ -70,8 +70,8 @@ def AlexNet(features , for_transfer_learning = False):
     kernel = 3
     channels = 384
     stride = 1
-    conv3_w = tf.Varaible(net_pretrained["conv3"]["weights"])
-    conv3_b = tf.Varaible(net_pretrained["conv3"]["biases"])
+    conv3_w = tf.Variable(net_pretrained["conv3"]["weights"])
+    conv3_b = tf.Variable(net_pretrained["conv3"]["biases"])
     conv3_in = conv(maxpool2 , conv3_w , conv3_b , kernel , kernel , channels , stride , stride , padding="SAME")
     conv3 = tf.nn.relu(conv3_in)
 
@@ -80,7 +80,7 @@ def AlexNet(features , for_transfer_learning = False):
     channels = 384
     stride = 1
     group = 2
-    conv4_w = tf.Varaible(net_pretrained["conv4"]["weights"])
+    conv4_w = tf.Variable(net_pretrained["conv4"]["weights"])
     conv4_b = tf.Variable(net_pretrained["conv4"]["biases"])
     conv4_in = conv(conv3 , conv4_w , conv4_b , kernel , kernel , channels , stride , stride , padding="SAME" , group = group)
     conv4 = tf.nn.relu(conv4_in)
@@ -90,7 +90,7 @@ def AlexNet(features , for_transfer_learning = False):
     channels = 256
     stride = 1
     group = 2
-    conv5_w = tf.Varaible(net_pretrained["conv5"]["weights"])
+    conv5_w = tf.Variable(net_pretrained["conv5"]["weights"])
     conv5_b = tf.Variable(net_pretrained["conv5"]["biases"])
     conv5_in = conv(conv4 , conv5_w , conv5_b , kernel , kernel , channels, stride , stride , padding="SAME", group =2)
     conv5 = tf.nn.relu(conv5_in)
@@ -102,19 +102,19 @@ def AlexNet(features , for_transfer_learning = False):
 
 
     # fc6
-    fc6_w = tf.Varaible(net_pretrained["fc6"]["weights"])
-    fc6_b = tf.Varaible(net_pretrained["fc6"]["biases"])
+    fc6_w = tf.Variable(net_pretrained["fc6"]["weights"])
+    fc6_b = tf.Variable(net_pretrained["fc6"]["biases"])
     full_connected6 = tf.nn.relu_layer(tf.reshape(maxpool5 , [-1 , int(np.prod(maxpool5.get_shape()[1:]))]) , fc6_w, fc6_b)
 
     #fc7
     fc7_w = tf.Variable(net_pretrained["fc7"]["weights"])
-    fc7_b = tf.Varaible(net_pretrained["fc7"]["biases"])
+    fc7_b = tf.Variable(net_pretrained["fc7"]["biases"])
     fc7 = tf.nn.relu_layer(full_connected6 , fc7W , fc7b)
 
     if for_transfer_learning:
         return fc7
     
-    fc8_w = tf.Varaible(net_pretrained["fc8"]["weights"])
+    fc8_w = tf.Variable(net_pretrained["fc8"]["weights"])
     fc8_b = tf.Variable(net_pretrained["fc8"]["biases"])
 
     logits = tf.nn.xw_plus_b(fc7 , fc8_w , fc8_b)
