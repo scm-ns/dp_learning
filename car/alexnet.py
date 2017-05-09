@@ -13,11 +13,9 @@ def conv(input , kernel , biases , kernel_h , kernel_w , num_channels , stride_h
     if group == 1:
         conv = convolve(input , kernel)
     else:
-        tf.split
         input_groups = tf.split(input , group ,3) # how to divide the input into groups with
         kernel_groups = tf.split(kernel , group , 3)
         output_groups = [convolve(i,k) for i , k in zip(input_groups , kernel_groups)]
-        print(output_groups)
         conv = tf.concat( output_groups , 3)
     # reshape the tensor, may be for feeding or reading from caffe ??
     return tf.reshape(tf.nn.bias_add(conv , biases) , [-1] + conv.get_shape().as_list()[1:])
@@ -92,7 +90,6 @@ def AlexNet(features , for_transfer_learning = False):
     kernel = 3
     channels = 256
     stride = 1
-    group = 2
     conv5_w = tf.Variable(net_pretrained["conv5"][0])
     conv5_b = tf.Variable(net_pretrained["conv5"][1])
     conv5_in = conv(conv4 , conv5_w , conv5_b , kernel , kernel , channels, stride , stride , padding="SAME", group =2)
@@ -106,19 +103,12 @@ def AlexNet(features , for_transfer_learning = False):
 
     # fc6
     fc6_w = tf.Variable(net_pretrained["fc6"][0])
-    print(fc6_w.get_shape())
     fc6_b = tf.Variable(net_pretrained["fc6"][1])
-    print(fc6_b.get_shape())
-    print(np.prod(maxpool5.get_shape()[1:]))
-    fc7_w = tf.Variable(net_pretrained["fc7"][0])
-    print(fc6_w.get_shape())
-    fc7_b = tf.Variable(net_pretrained["fc7"][1])
-    print(fc6_b.get_shape())
-
-
     full_connected6 = tf.nn.relu_layer(tf.reshape(maxpool5 , [-1 , int(np.prod(maxpool5.get_shape()[1:]))]) , fc6_w, fc6_b)
 
     #fc7
+    fc7_w = tf.Variable(net_pretrained["fc7"][0])
+    fc7_b = tf.Variable(net_pretrained["fc7"][1])
     fc7 = tf.nn.relu_layer(full_connected6 , fc7_w , fc7_b)
 
     if for_transfer_learning:
