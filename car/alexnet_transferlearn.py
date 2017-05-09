@@ -6,15 +6,12 @@ from scipy.misc import imread
 from scipy.misc import imresize
 
 
-train_x =  np.zeros((1, 227 , 227 , 3)).astype(np.float32)
-train_y = np.zeros((1,1000))
-xdim = train_x.shape[1:]
-ydim = train_y.shape[1]
-
 from alexnet import AlexNet
 from caffe_classes import class_names
 
-x = tf.placeholder(tf.float32 ,(None,) + xdim)
+input_img_dim = (227 , 227 , 3)
+
+x = tf.placeholder(tf.float32 ,(None,) + input_img_dim)
 resized = tf.image.resize_images(x , (227,227))
 
 prob = AlexNet(resized)
