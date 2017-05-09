@@ -9,7 +9,7 @@ from scipy.misc import imresize
 from alexnet import AlexNet
 from caffe_classes import class_names
 
-input_img_dim = (227 , 227 , 3)
+input_img_dim = (32 , 32 , 3)
 
 x = tf.placeholder(tf.float32 ,(None,) + input_img_dim)
 resized = tf.image.resize_images(x , (227,227))
@@ -20,10 +20,11 @@ init = tf.initialize_all_variables()
 sess = tf.Session()
 sess.run(init)
 
-im1 = (imread("poodle.png")[:,:,:3]).astype(np.float32)
+#im1 = (imread("poodle.png")[:,:,:3]).astype(np.float32)
+im1 = (imread("construction.jpg")[:,:,:3]).astype(np.float32)
 im1 = im1 - np.mean(im1)
 
-im2 = (imread("weasel.png")[:,:,:3]).astype(np.float32)
+im2 = (imread("stop.jpg")[:,:,:3]).astype(np.float32)
 im2 = im2 - np.mean(im2)
 
 t = time.time()
