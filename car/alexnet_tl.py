@@ -5,7 +5,6 @@ import time
 from scipy.misc import imread
 from scipy.misc import imresize
 
-
 from alexnet import AlexNet
 from caffe_classes import class_names
 
@@ -14,7 +13,7 @@ input_img_dim = (32 , 32 , 3)
 x = tf.placeholder(tf.float32 ,(None,) + input_img_dim)
 resized = tf.image.resize_images(x , (227,227))
 
-prob = AlexNet(resized)
+prob = alex_net(resized)
 
 init = tf.initialize_all_variables()
 sess = tf.Session()
@@ -29,7 +28,6 @@ im2 = im2 - np.mean(im2)
 
 t = time.time()
 output = sess.run(prob , feed_dict ={x:[im1 , im2]})
-
 
 for input_im_index in range(output.shape[0]):
     indexs = np.argsort(output)[input_im_index,:]
