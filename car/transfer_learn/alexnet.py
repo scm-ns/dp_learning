@@ -21,7 +21,7 @@ def conv(input , kernel , biases , kernel_h , kernel_w , num_channels , stride_h
     return tf.reshape(tf.nn.bias_add(conv , biases) , [-1] + conv.get_shape().as_list()[1:])
 
 
-def AlexNet(features , for_transfer_learning = False):
+def alex_net(features , for_transfer_learning = False):
     # Builds model and loads pretrained model
     kernel_size = 11
     stride = 4
