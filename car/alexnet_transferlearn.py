@@ -29,9 +29,11 @@ im1 = np.array(im1).reshape(1 , 227 ,227,3)
 
 im2 = (imread("weasel.png")[:,:,:3]).astype(np.float32)
 im2 = im2 - np.mean(im2)
+im2 = np.array(im2).reshape(1 , 227 ,227,3)
 
 t = time.time()
 output = sess.run(prob , feed_dict ={x:im1})
+output = sess.run(prob , feed_dict ={x:im2})
 
 
 for input_im_index in range(output.shape[0]):
