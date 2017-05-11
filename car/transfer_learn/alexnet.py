@@ -21,7 +21,7 @@ def conv(input , kernel , biases , kernel_h , kernel_w , num_channels , stride_h
     return tf.reshape(tf.nn.bias_add(conv , biases) , [-1] + conv.get_shape().as_list()[1:])
 
 
-def alex_net(features , for_transfer_learning = False):
+def alex_net(features , for_transfer_learning = False , retrain_last_layer_num_classes):
     # Builds model and loads pretrained model
     kernel_size = 11
     stride = 4
@@ -113,12 +113,14 @@ def alex_net(features , for_transfer_learning = False):
 
     if for_transfer_learning:
         return fc7
-    
-    fc8_w = tf.Variable(net_pretrained["fc8"][0])
-    fc8_b = tf.Variable(net_pretrained["fc8"][1])
 
-    logits = tf.nn.xw_plus_b(fc7 , fc8_w , fc8_b)
-    probs = tf.nn.softmax(logits)
-
-    return  probs
-
+    if retrain_last_layer_num_classes is None:
+        fc8_w = tf.Variable(net_pretrained["fc8"][0])
+        fc8_b = tf.Variable(net_pretrained["fc8"][1])
+        logits = tf.nn.xw_plus_b(fc7 , fc8_w , fc8_b)
+    else :
+        fc8_w = tf.Variable(tf.truncated_normal(net_pretrained["fc8"][0].shape[0] , retrain_last_layer_num_classes] , stddev = 0.005))
+        fc8_b = tf.Variable(tf.zeros(retrain_last_layer_num_classes))
+        logits = tf.nn.xw_plus_b(fc7 , fc8_w , fc8_b)
+        
+    return tf.nn.softmax(logits)
