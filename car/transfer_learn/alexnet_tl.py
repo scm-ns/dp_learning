@@ -5,7 +5,7 @@ import time
 from scipy.misc import imread
 from scipy.misc import imresize
 
-from alexnet import AlexNet
+from alexnet import alex_net
 from caffe_classes import class_names
 
 input_img_dim = (32 , 32 , 3)
