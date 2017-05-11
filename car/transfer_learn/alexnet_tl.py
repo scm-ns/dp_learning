@@ -27,13 +27,16 @@ im2 = (imread("stop.jpg")[:,:,:3]).astype(np.float32)
 im2 = im2 - np.mean(im2)
 
 t = time.time()
+# output is not a single images predicition, but concatenation of mulitpl images's prediction
 output = sess.run(prob , feed_dict ={x:[im1 , im2]})
 
+
 for input_im_index in range(output.shape[0]):
-    indexs = np.argsort(output)[input_im_index,:]
+    # lines identifies the most probable class for each of images
+    indexs = np.argsort(output)[input_im_index,:] # arrange in increasing order
     print("Image : " , input_im_index)
-    for i in range(5):
-        print("%s: %.3f" % (class_names[indexs[-1-i]], output[input_im_index , indexs[-1-i]]))
+    for i in range(5): # print the top 5 classes, indexs , the most probable classes are towards the end
+        print("%s: %.3f" % (class_names[indexs[-1-i]], output[input_im_index , indexs[-1-i]])) 
     print()
 
 print("Time :%.3f seconds" % (time.time() - t))
