@@ -2,8 +2,8 @@ import pickle
 import os
 import csv 
 
-train_data_file = "data/train.pkl"
-test_data_file = "data/test.pkl"
+train_data_file = "data/train.pkl2"
+test_data_file = "data/test.pkl2"
 
 with open(train_data_file , mode ="rb") as f:
     train = pickle.load(f)
