@@ -15,4 +15,9 @@ done
 # now convert python 3 pickle formet into python 2 using python script
 python3 ../conv_py_3_pickle_to_py_2.py
 
+# remove py 3 pickle
+rm -rf *.pkl3
+
+# move back up
+cd ..
 
