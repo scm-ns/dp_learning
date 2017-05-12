@@ -1,10 +1,9 @@
 import pickle
-from sklearn.model_selection import train_test_split
-from keras.utils import np_utils
+import os
 import csv 
 
-train_data_file = "./data/train.p"
-test_data_file = "./data/test.p"
+train_data_file = "data/train.pkl"
+test_data_file = "data/test.pkl"
 
 with open(train_data_file , mode ="rb") as f:
     train = pickle.load(f)
