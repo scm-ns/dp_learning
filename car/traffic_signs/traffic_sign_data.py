@@ -15,7 +15,11 @@ y_test , y_test =   test["features"] , test["labels"]
 
 with open("signnames.csv", "r") as csvfile:
     reader = csv.reader(csvfile)
-    print(reader)
+    next(reader , None)
+    sign_names = dict(int(n) , label) for n , label in reader)
 
-    
+cls_number , cls_names = zip(*sign_names.items())
+
+print(cls_number)
+print(cls_names)
 
