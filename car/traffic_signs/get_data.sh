@@ -9,6 +9,10 @@ rm *docx
 # Enter data and rename *.p files in *.pkl files
 for file in *.p
 do 
-	mv "$file" "${file%.p}.pkl"
+	mv "$file" "${file%.p}.pkl3"
 done
+
+# now convert python 3 pickle formet into python 2 using python script
+python3 ../conv_py_3_pickle_to_py_2.py
+
 
