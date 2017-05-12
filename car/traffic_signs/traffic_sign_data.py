@@ -15,9 +15,11 @@ y_test , y_test =   test["features"] , test["labels"]
 
 with open("signnames.csv", "r") as csvfile:
     reader = csv.reader(csvfile)
-    next(reader , None)
+    next(reader , None) # skip header
+    # create dict from reader
     sign_names = dict((int(n) , label) for n , label in reader)
 
+# convert the key:value pairs into seperate varaible
 cls_number , cls_names = zip(*sign_names.items())
 
 print(cls_number)
