@@ -219,7 +219,7 @@ class vgg16:
                 print idx , key , np.shape(pretrained_weights[key])
                 sess.run(self.params[idx].assign(pretrained_weights[key]))
 
-    def predicted_probs_layer():
+    def predicted_probs_layer(self):
             return  tf.nn.softmax(self.output_layer);
 
 
@@ -229,7 +229,7 @@ if __name__ == "__main__":
     vgg = vgg16(imgs)
     vgg.load_weights("vgg16_weights.npz", sess)
     
-    im1 = "file_name"
+    im1 = "poodle.png"
     im1 = imread(im1 , mode = "RGB" )
     im1 = imresize(im1 ,  ( 224 , 244))
     
