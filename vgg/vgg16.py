@@ -59,13 +59,36 @@ class vgg16:
         pool2 = tf.nn.max_pool(conv_2_2_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
 
 
+        conv_3_1_out;
+        with tf.name_scope("conv_3_1") as scope: 
+            in_size = 128
+            out_size = 256
+            weights = tf.Variable(tf.truncatedNormal([3 , 3 , in_size , out_size] , dtype = tf.float32 , stddev = 1e-1))
+            bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
+            conv = tf.nn.conv2d(pool_2, weights, [1 ,1 , 1 , 1] , padding = "SAME") 
+            out = tf.nn.bias_add(conv , bias) 
+            conv_3_1_out = tf.nn.relu(out)
 
+        conv_3_2_out;
+        with tf.name_scope("conv_3_2") as scope: 
+            in_size = 256
+            out_size = 256
+            weights = tf.Variable(tf.truncatedNormal([3 , 3 , in_size , out_size] , dtype = tf.float32 , stddev = 1e-1))
+            bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
+            conv = tf.nn.conv2d(conv_3_1_out , weights, [1 ,1 , 1 , 1] , padding = "SAME") 
+            out = tf.nn.bias_add(conv , bias) 
+            conv_3_2_out = tf.nn.relu(out)
 
+        conv_3_3_out;
+        with tf.name_scope("conv_3_3") as scope: 
+            in_size = 256
+            out_size = 256
+            weights = tf.Variable(tf.truncatedNormal([3 , 3 , in_size , out_size] , dtype = tf.float32 , stddev = 1e-1))
+            bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
+            conv = tf.nn.conv2d(conv_3_2_out , weights, [1 ,1 , 1 , 1] , padding = "SAME") 
+            out = tf.nn.bias_add(conv , bias) 
+            conv_3_3_out = tf.nn.relu(out)
 
-
-
-
-
-
+        pool3 = tf.nn.max_pool(conv_3_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
 
 
