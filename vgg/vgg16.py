@@ -41,6 +41,7 @@ class vgg16:
             out = tf.nn.bias_add(conv , bias) 
             conv_1_2_out = tf.nn.relu(out)
             self.params += [weights , bias]
+    
 
         pool_1 = tf.nn.max_pool(conv_1_2_out , ksize = [1 ,2 , 2 , 1] , strides = [1 ,2 ,2 , 1], padding="SAME" )
         
@@ -64,7 +65,7 @@ class vgg16:
             bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
             conv = tf.nn.conv2d(conv_2_1_out , weights, [1 ,1 , 1 , 1] , padding = "SAME") 
             out = tf.nn.bias_add(conv , bias) 
-            conv_2_1_out = tf.nn.relu(out)
+            conv_2_2_out = tf.nn.relu(out)
             self.params += [weights , bias]
 
         pool2 = tf.nn.max_pool(conv_2_2_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
@@ -148,7 +149,7 @@ class vgg16:
             bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
             conv = tf.nn.conv2d(pool_4, weights, [1 ,1 , 1 , 1] , padding = "SAME") 
             out = tf.nn.bias_add(conv , bias) 
-            conv_3_1_out = tf.nn.relu(out)
+            conv_5_1_out = tf.nn.relu(out)
             self.params += [weights , bias]
 
         conv_5_2_out = 0 ;
