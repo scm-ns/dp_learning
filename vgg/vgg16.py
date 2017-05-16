@@ -10,10 +10,13 @@ class vgg16:
     def __init__(imgs):
 
         self.params = []
+        
         # remove imagenet image means
         imagenet_mean = [123.68 , 116.779 , 103.939]
         mean = tf.constant( imagenet_mean , dtype= tf.float32 , shape=[1 , 1 , 1 , 3] , name = "img_mean")
-        net_in = imgs - mean
+        self.imgs = imgs
+        net_in = self.imgs - mean
+        self.input_layer = net_in
    
         conv_1_1_out;
         with tf.name_scope("conv_1_1") as scope: 
@@ -26,6 +29,7 @@ class vgg16:
             conv_1_1_out = tf.nn.relu(out)
             self.params += [weights , bias]
 
+        self.first_layer = conv_1_1_out;
  
         conv_1_2_out;
         with tf.name_scope("conv_1_2") as scope: 
@@ -203,6 +207,7 @@ class vgg16:
             fc3 = out ; # no relu for the last layer # apply softmax to the output
             self.params += [weights , bias]
 
+        self.output_layer = fc3;
 
     def load_weights(self , weight_file , sess):
             pretrained_weights = np.load(weight_file)
@@ -211,5 +216,22 @@ class vgg16:
                 print idx , key , np.shape(pretrained_weights[key])
                 sess.run(self.params[idx].assign(pretrained_weights[key]))
 
+    def predicted_probs_layer():
+            return  tf.nn.softmax(self.output_layer);
 
+
+if __name__ == "__main__":
+    sess = tf.Session()
+    imgs = tf.placeholder(tf.float32 , [None , 224 , 224 , 3])
+    vgg = vgg16(imgs)
+    vgg.load_weights("vgg16_weights.npz", sess)
+    
+    im1 = "file_name"
+    im1 = imread(im1 , mode = "RGB" )
+    im1 = imresize(im1 ,  ( 224 , 244))
+    
+    probs = sess.run(vgg.predicted_probs_layer() , feed_dict = {vgg.imgs : [im1]})[0]
+    preds = (np.argsort(probs)[::-1][0:5])
+    for p in preds: 
+        print class_names[p] , prob[p]
 
