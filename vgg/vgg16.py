@@ -68,7 +68,7 @@ class vgg16:
             conv_2_2_out = tf.nn.relu(out)
             self.params += [weights , bias]
 
-        pool2 = tf.nn.max_pool(conv_2_2_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
+        pool_2 = tf.nn.max_pool(conv_2_2_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
 
 
         conv_3_1_out =0 ;
