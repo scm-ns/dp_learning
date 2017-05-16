@@ -91,4 +91,80 @@ class vgg16:
 
         pool3 = tf.nn.max_pool(conv_3_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
 
+        conv_4_1_out;
+        with tf.name_scope("conv_4_1") as scope: 
+            in_size = 256
+            out_size = 512
+            weights = tf.Variable(tf.truncatedNormal([3 , 3 , in_size , out_size] , dtype = tf.float32 , stddev = 1e-1))
+            bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
+            conv = tf.nn.conv2d(pool_3, weights, [1 ,1 , 1 , 1] , padding = "SAME") 
+            out = tf.nn.bias_add(conv , bias) 
+            conv_4_1_out = tf.nn.relu(out)
+
+        conv_4_2_out;
+        with tf.name_scope("conv_4_2") as scope: 
+            in_size = 512
+            out_size = 512
+            weights = tf.Variable(tf.truncatedNormal([3 , 3 , in_size , out_size] , dtype = tf.float32 , stddev = 1e-1))
+            bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
+            conv = tf.nn.conv2d(conv_4_1_out , weights, [1 ,1 , 1 , 1] , padding = "SAME") 
+            out = tf.nn.bias_add(conv , bias) 
+            conv_4_2_out = tf.nn.relu(out)
+
+        conv_4_3_out;
+        with tf.name_scope("conv_4_3") as scope: 
+            in_size = 512
+            out_size = 512
+            weights = tf.Variable(tf.truncatedNormal([3 , 3 , in_size , out_size] , dtype = tf.float32 , stddev = 1e-1))
+            bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
+            conv = tf.nn.conv2d(conv_4_2_out , weights, [1 ,1 , 1 , 1] , padding = "SAME") 
+            out = tf.nn.bias_add(conv , bias) 
+            conv_4_3_out = tf.nn.relu(out)
+
+        pool4 = tf.nn.max_pool(conv_4_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
+
+        conv_5_1_out;
+        with tf.name_scope("conv_5_1") as scope: 
+            in_size = 512
+            out_size = 512
+            weights = tf.Variable(tf.truncatedNormal([3 , 3 , in_size , out_size] , dtype = tf.float32 , stddev = 1e-1))
+            bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
+            conv = tf.nn.conv2d(pool_4, weights, [1 ,1 , 1 , 1] , padding = "SAME") 
+            out = tf.nn.bias_add(conv , bias) 
+            conv_3_1_out = tf.nn.relu(out)
+
+        conv_5_2_out;
+        with tf.name_scope("conv_5_2") as scope: 
+            in_size = 512
+            out_size = 512
+            weights = tf.Variable(tf.truncatedNormal([3 , 3 , in_size , out_size] , dtype = tf.float32 , stddev = 1e-1))
+            bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
+            conv = tf.nn.conv2d(conv_5_1_out , weights, [1 ,1 , 1 , 1] , padding = "SAME") 
+            out = tf.nn.bias_add(conv , bias) 
+            conv_5_2_out = tf.nn.relu(out)
+
+        conv_5_3_out;
+        with tf.name_scope("conv_4_3") as scope: 
+            in_size = 512
+            out_size = 512
+            weights = tf.Variable(tf.truncatedNormal([3 , 3 , in_size , out_size] , dtype = tf.float32 , stddev = 1e-1))
+            bias = tf.Variable(tf.constant(0.0 , shape = [out_size] , dtype = tf.float32))
+            conv = tf.nn.conv2d(conv_5_2_out , weights, [1 ,1 , 1 , 1] , padding = "SAME") 
+            out = tf.nn.bias_add(conv , bias) 
+            conv_5_3_out = tf.nn.relu(out)
+
+        pool5 = tf.nn.max_pool(conv_5_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
+
+
+
+
+
+
+
+
+
+
+
+
+
 
