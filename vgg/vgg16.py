@@ -5,6 +5,8 @@
 
 import tensorflow as tf
 import numpy as np
+from scipy.misc import imread, imresize
+
 
 class vgg16:
     def __init__(self, imgs):
