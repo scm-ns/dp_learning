@@ -231,10 +231,8 @@ if __name__ == "__main__":
     
     im1 = "poodle.png"
     im1 = imread(im1 , mode = "RGB" )
-    im1 = imresize(im1 ,  ( 224 , 244))
+    im1 = imresize(im1 ,  ( 224 , 224))
     
     probs = sess.run(vgg.predicted_probs_layer() , feed_dict = {vgg.imgs : [im1]})[0]
     preds = (np.argsort(probs)[::-1][0:5])
-    for p in preds: 
-        print class_names[p] , prob[p]
-
+    print(preds)
