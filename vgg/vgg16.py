@@ -201,7 +201,7 @@ class vgg16:
         fc3 = 0;
         with tf.name_scope("fc2") as scope:
             in_size = 4096
-            out_size = 4096
+            out_size = 1000
             weights = tf.Variable(tf.truncated_normal([in_size , out_size] , dtype= tf.float32))
             bias = tf.Variable(tf.constant(1.0 , shape = [out_size] , dtype = tf.float32))
             out = tf.nn.bias_add(tf.matmul(fc2 , weights) , bias)
