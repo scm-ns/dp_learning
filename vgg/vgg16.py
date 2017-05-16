@@ -104,7 +104,7 @@ class vgg16:
             conv_3_3_out = tf.nn.relu(out)
             self.params += [weights , bias]
 
-        pool3 = tf.nn.max_pool(conv_3_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
+        pool_3 = tf.nn.max_pool(conv_3_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
 
         conv_4_1_out = 0;
         with tf.name_scope("conv_4_1") as scope: 
@@ -139,7 +139,7 @@ class vgg16:
             conv_4_3_out = tf.nn.relu(out)
             self.params += [weights , bias]
 
-        pool4 = tf.nn.max_pool(conv_4_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
+        pool_4 = tf.nn.max_pool(conv_4_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
 
         conv_5_1_out = 0;
         with tf.name_scope("conv_5_1") as scope: 
@@ -174,17 +174,17 @@ class vgg16:
             conv_5_3_out = tf.nn.relu(out)
             self.params += [weights , bias]
 
-        pool5 = tf.nn.max_pool(conv_5_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
+        pool_5 = tf.nn.max_pool(conv_5_3_out , ksize = [1 , 2 ,2 , 1] , strides= [1 , 2 ,2 ,1 ], padding = "SAME" )
 
         fc1 = 0;
         with tf.name_scope("fc1") as scope:
-            num_pool_units = int(np.prod(pool5.get_shape()[1:])) # get the number of units in the pool layer # 1: ignore the number of images feed into the network  
+            num_pool_units = int(np.prod(pool_5.get_shape()[1:])) # get the number of units in the pool layer # 1: ignore the number of images feed into the network  
             in_size = num_pool_units
             out_size = 4096
             weights = tf.Variable(tf.truncated_normal([in_size , out_size] , dtype= tf.float32))
             bias = tf.Variable(tf.constant(1.0 , shape= [out_size] , dtype = tf.float32))
-            pool5_flat = tf.resize(pool5 , [-1 , num_pool_units])
-            out = tf.nn.bias_add(tf.nn.matmul(pool5_flat , weights) , bias)
+            pool_5_flat = tf.reshape(pool_5 , [-1 , num_pool_units])
+            out = tf.nn.bias_add(tf.matmul(pool_5_flat , weights) , bias)
             fc1 = tf.nn.relu(out)
             self.params += [weights , bias]
 
@@ -194,7 +194,7 @@ class vgg16:
             out_size = 4096
             weights = tf.Variable(tf.truncated_normal([in_size , out_size] , dtype= tf.float32))
             bias = tf.Variable(tf.constant(1.0 , shape= [out_size] , dtype = tf.float32))
-            out = tf.nn.bias_add(tf.nn.matmul(fc1 , weights) , bias)
+            out = tf.nn.bias_add(tf.matmul(fc1 , weights) , bias)
             fc2 = tf.nn.relu(out)
             self.params += [weights , bias]
 
@@ -204,7 +204,7 @@ class vgg16:
             out_size = 4096
             weights = tf.Variable(tf.truncated_normal([in_size , out_size] , dtype= tf.float32))
             bias = tf.Variable(tf.constant(1.0 , shape = [out_size] , dtype = tf.float32))
-            out = tf.nn.bias_add(tf.nn.matmul(fc2 , weights) , bias)
+            out = tf.nn.bias_add(tf.matmul(fc2 , weights) , bias)
             fc3 = out ; # no relu for the last layer # apply softmax to the output
             self.params += [weights , bias]
 
