@@ -204,3 +204,12 @@ class vgg16:
             self.params += [weights , bias]
 
 
+    def load_weights(self , weight_file , sess):
+            pretrained_weights = np.load(weight_file)
+            keys = sorted(pretrained_weights.keys())
+            for idx , key in enumerate(keys):
+                print idx , key , np.shape(pretrained_weights[key])
+                sess.run(self.params[idx].assign(pretrained_weights[key]))
+
+
+
