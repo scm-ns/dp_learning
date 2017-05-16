@@ -25,3 +25,13 @@ cls_number , cls_names = zip(*sign_names.items())
 print(cls_number)
 print(cls_names)
 
+image_shape = x_train.shape()
+
+n_classes = len(set(y_train))
+
+print("train len : "  , len(x_train))
+print("test len : "  , len(x_test))
+print("num classes : "  , len(set(y_train))
+
+
+

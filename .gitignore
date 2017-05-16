@@ -1,6 +1,6 @@
 *.sw*
 *.pyc
 *.caffemodel
-*.npy
+*.np*
 *.zip
 *data/
